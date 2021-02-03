@@ -6,6 +6,7 @@ import Quiz from "./Quiz";
 import Score from "./Score";
 
 /*2주차 44:39*/
+/*2주차 44:39*/
 
 class App extends React.Component {
     constructor(props) {
