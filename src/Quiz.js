@@ -1,56 +1,66 @@
 import React from "react";
 import styled from "styled-components";
-import img from "./dog.png";
-import TinderCard from 'react-tinder-card';
+import Score from "./Score";
+import SwipeItem from "./SwipeItem";
+
+
+import { useSelector, useDispatch } from "react-redux";
+import {addAnswer} from "./redux/modules/quiz";
 
 const Quiz = (props) => {
+    const dispatch = useDispatch();
+    const answers = useSelector((state) => state.quiz.answers);
+    const quiz = useSelector((state) => state.quiz.quiz);
 
-    const [num, setNum] = React.useState(0);
+    const num = answers.length;
 
     const onSwipe = (direction) => {
-        console.log(direction)
-        setNum(num+1)
+        console.log('direction')
+        let _answer = direction === "left"? "O" : "X";
+
+        if(_answer === quiz[num].answer){
+            // 정답일 경우,
+            dispatch(addAnswer(true));
+        }else{
+            // 오답일 경우,
+            dispatch(addAnswer(false));
+        }
     }
-    const list = props.list;
+
+    if (num > quiz.length -1) {
+        return <Score {...props}/>;
+        // return <div>퀴즈 끝!</div>;
+    }
+
 
     return (
         <QuizContainer>
-            <p><span>{num + 1}번문제</span></p>
-            <Question>
-                {
-                    list.map((l, idx) => {
-                        if (num === idx) {
-                            return (<Question key={idx}>{l.question}</Question>)
-                        }
-                    })
+            <p>
+                <span>{num + 1}번 문제</span>
+            </p>
+            {quiz.map((l, idx) => {
+                if (num === idx) {
+                    return <Question key={idx}>{l.question}</Question>;
                 }
+            })}
 
-            </Question>
             <AnswerZone>
-                <Answer>O</Answer>
-                <Answer>X</Answer>
+                <Answer>{"O "}</Answer>
+                <Answer>{" X"}</Answer>
             </AnswerZone>
-            {
-                list.map((l, idx) => {
-                    if (num === idx) {
-                        return (
-                            <DragItem>
-                                <TinderCard onSwipe={onSwipe}>
-                                    <img src={img}/>
-                                </TinderCard>
-                            </DragItem>
-                        )
-                    }
-                })
-            }
+
+            {quiz.map((l, idx) => {
+                if (idx === num) {
+                    return <SwipeItem  key={idx} onSwipe={onSwipe}/>;
+                }
+            })}
         </QuizContainer>
     );
-}
+};
 
 const QuizContainer = styled.div`
-  padding: 20px 0;
-  text-align: center;
-
+  margin-top: 16px;
+  width: 100%;
   & > p > span {
     padding: 8px 16px;
     background-color: #fef5d4;
@@ -91,14 +101,11 @@ const DragItem = styled.div`
   height: 100vh;
 
   & > div {
-    border:5px solid #ffd6aa;
+    border-radius: 500px;
     background-color: #ffd6aa;
   }
-
   & img {
     max-width: 150px;
   }
 `;
-
-
 export default Quiz;
